@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_task_v1_app/views/add_task_ui.dart';
+import 'add_task_ui.dart';
 
 class ShowAllTaskUi extends StatefulWidget {
   const ShowAllTaskUi({super.key});
@@ -13,17 +13,19 @@ class _ShowAllTaskUiState extends State<ShowAllTaskUi> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Colors.green,
         title: Text(
-          'Task Krubb - All Task',
+          'Task Na Ja V.1',
           style: TextStyle(
-            color: Colors.white,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.green,
         onPressed: () {
           Navigator.push(
             context,
@@ -32,7 +34,6 @@ class _ShowAllTaskUiState extends State<ShowAllTaskUi> {
             ),
           );
         },
-        backgroundColor: Colors.greenAccent,
         child: Icon(
           Icons.add,
           color: Colors.white,

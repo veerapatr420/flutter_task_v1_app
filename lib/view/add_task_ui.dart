@@ -12,12 +12,13 @@ class _AddTaskUiState extends State<AddTaskUi> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.greenAccent,
+        backgroundColor: Colors.green,
         title: Text(
-          'Task Krubb - Add',
+          'Task Na Ja V.1',
           style: TextStyle(
-            color: Colors.white,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
@@ -26,7 +27,7 @@ class _AddTaskUiState extends State<AddTaskUi> {
             Navigator.pop(context);
           },
           icon: Icon(
-            Icons.arrow_back_ios,
+            Icons.arrow_back_ios_new,
             color: Colors.white,
           ),
         ),

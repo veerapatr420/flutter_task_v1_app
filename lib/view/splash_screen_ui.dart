@@ -1,16 +1,14 @@
-// ignore_for_file: must_call_super
-
 import 'package:flutter/material.dart';
-import 'package:flutter_task_v1_app/views/show_all_task_ui.dart';
+import 'show_all_task_ui.dart';
 
-class SplachScreenUi extends StatefulWidget {
-  const SplachScreenUi({super.key});
+class SplashScreenUi extends StatefulWidget {
+  const SplashScreenUi({super.key});
 
   @override
-  State<SplachScreenUi> createState() => _SplachScreenUiState();
+  State<SplashScreenUi> createState() => _SplashScreenUiState();
 }
 
-class _SplachScreenUiState extends State<SplachScreenUi> {
+class _SplashScreenUiState extends State<SplashScreenUi> {
   @override
   void initState() {
     Future.delayed(Duration(seconds: 3), () {
@@ -21,60 +19,70 @@ class _SplachScreenUiState extends State<SplachScreenUi> {
         ),
       );
     });
+    super.initState();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.greenAccent,
+      backgroundColor: Colors.green,
       body: Stack(
         children: [
+          //ชั้นที่1
           Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  'assets/Logo.png',
+                  'assets/images/logo.png',
                   width: 200,
                   height: 200,
+                  fit: BoxFit.cover,
                 ),
-                SizedBox(height: 20),
+                SizedBox(
+                  height: 20,
+                ),
                 Text(
-                  'Task Krubb',
+                  'Task Na Ja V.1',
                   style: TextStyle(
-                    fontSize: 24,
+                    fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(
+                  height: 20,
+                ),
                 CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
+                  color: Colors.white,
+                )
               ],
             ),
           ),
+          //ชั้นที่ 2
           Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  'Created by Markrock',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white70,
-                  ),
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text(
+                'Create By Veerapatr Poo.',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade400,
                 ),
-                Text(
-                  'Southeast Asia University',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white70,
-                  ),
+              ),
+              Text(
+                'Southeast Asia University.',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey.shade600,
                 ),
-                SizedBox(height: 20),
-              ],
-            ),
-          ),
+              ),
+              SizedBox(
+                height: 50,
+              ),
+            ],
+          ))
         ],
       ),
     );
