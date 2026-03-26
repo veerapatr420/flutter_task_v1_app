@@ -1,4 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:flutter_task_v1_app/models/task.dart';
+import 'package:flutter_task_v1_app/services/supabase_service.dart';
 
 class AddTaskUi extends StatefulWidget {
   const AddTaskUi({super.key});
@@ -8,11 +13,55 @@ class AddTaskUi extends StatefulWidget {
 }
 
 class _AddTaskUiState extends State<AddTaskUi> {
+  //สร้างตัวควบคุมTexField และตัวแปรที่จะต้องเก็บข้อมูลที่ผู้ใช้ป้อนหรือเลือก เพื่อบันทึกใน task_tb
+  TextEditingController taskNameCtrl = TextEditingController();
+  TextEditingController taskWhereCtrl = TextEditingController();
+  TextEditingController taskPersonCtrl = TextEditingController();
+  bool taskStatus = false;
+  TextEditingController taskDuedateCtrl = TextEditingController();
+  String? taskImageUrl = '';
+  //ตัวแปรเก็บไฟล์ที่ใช้อัปโหลด
+  File? file;
+
+//---- เปิดกลองถ่ายภาพ และกำหนดค่ารูปเพื่อ upload ----
+
+  Future<void> pickImage() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.camera);
+
+    if (picked != null) {
+      setState(() {
+        file = File(picked.path);
+      });
+    }
+  }
+
+  //-------------------------
+
+  //---- เปิดปฏิทันเลือกวันที่ และกำหนดค่าวันที่ ----
+  DateTime? selectedDate;
+
+  Future<void> pickDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+        taskDuedateCtrl.text = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
+  }
+
+  //-------------------------
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.blueAccent,
         title: Text(
           'Task Na Ja V.1',
           style: TextStyle(
@@ -31,6 +80,244 @@ class _AddTaskUiState extends State<AddTaskUi> {
             color: Colors.white,
           ),
         ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+            padding: EdgeInsets.only(top: 30, left: 45, right: 45, bottom: 50),
+            child: Center(
+              child: Column(
+                children: [
+                  // ส่วนแสดงรูปและรูปกล้องเพื่อเปิดกล้อง
+                  file == null
+                      ? InkWell(
+                          onTap: () {
+                            pickImage();
+                          },
+                          child: Icon(
+                            Icons.add_a_photo_rounded,
+                            size: 150,
+                            color: Colors.grey[300],
+                          ),
+                        )
+                      : InkWell(
+                          onTap: () {
+                            pickImage();
+                          },
+                          child: Image.file(
+                            file!,
+                            width: 150,
+                            height: 150,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  // ป้อนทำอะไร
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'ทำอะไร',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  TextField(
+                    controller: taskNameCtrl,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      hintText: 'เช่น ซักผ้า, ซ่อมหลอดไฟ',
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  // ป้อนทำที่ไหน
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'ทำที่ไหน',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  TextField(
+                    controller: taskWhereCtrl,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      hintText: 'เช่น บ้าน, ที่ทำงาน',
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  // ป้อนทำกันกี่คน
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'ทำกันกี่คน',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  TextField(
+                    controller: taskPersonCtrl,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      hintText: 'เช่น 2, 5',
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  // เลือกทำเสร็จหรือยัง
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'ทำเสร็จหรือยัง',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            taskStatus = true;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              taskStatus == true ? Colors.blue : Colors.grey,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          fixedSize: Size(
+                            MediaQuery.of(context).size.width * 0.35,
+                            50,
+                          ),
+                        ),
+                        child: Text(
+                          'เสร็จแล้ว',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            taskStatus = false;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              taskStatus == false ? Colors.blue : Colors.grey,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          fixedSize: Size(
+                            MediaQuery.of(context).size.width * 0.35,
+                            50,
+                          ),
+                        ),
+                        child: Text(
+                          'ยังไม่เสร็จ',
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  // เลือกต้องเสร็จเมื่อไหร่
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'เสร็จเมื่อไหร่',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
+                  TextField(
+                    controller: taskDuedateCtrl,
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      hintText: 'เช่น 2020-01-31',
+                      suffixIcon: Icon(Icons.calendar_today),
+                    ),
+                    onTap: () {
+                      pickDate();
+                    },
+                  ),
+                  SizedBox(height: 20),
+                  // ปุ่มบันทึก
+                  ElevatedButton(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      fixedSize: Size(
+                        MediaQuery.of(context).size.width,
+                        50,
+                      ),
+                    ),
+                    child: Text(
+                      'บันทึก',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  // ปุ่มยกเลิก
+                  ElevatedButton(
+                    onPressed: () {
+                      //เคลียร์หน้าจอ
+                      setState(() {
+                        taskNameCtrl.clear();
+                        taskWhereCtrl.clear();
+                        taskPersonCtrl.clear();
+                        taskDuedateCtrl.clear();
+                        taskStatus = false;
+                        file = null;
+                        taskImageUrl = '';
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                      fixedSize: Size(
+                        MediaQuery.of(context).size.width,
+                        50,
+                      ),
+                    ),
+                    child: Text(
+                      'ยกเลิก',
+                      style: TextStyle(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )),
       ),
     );
   }
